@@ -2,8 +2,11 @@ package com.simplenews.ui.main_activity
 
 import android.os.Bundle
 import android.view.View
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simplenews.MainAdapter
 import com.simplenews.MainScrollListener
@@ -12,19 +15,46 @@ import com.simplenews.callback.MainAdapterCallback
 import com.simplenews.model.Article
 import kotlinx.android.synthetic.main.activity_main.*
 
+
 class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback {
+
+    private val mainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
     private val mainPresenter = MainPresenter()
     private lateinit var mainAdapter: MainAdapter
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         mainPresenter.init(this)
         initAdapter()
-        mainPresenter.getNews()
+
+
+        if (savedInstanceState == null) {
+            mainPresenter.getNews()
+        } else {
+
+            mainViewModel.webViewVisibility.observe(this, Observer {
+                mainWebView.visibility = it
+            })
+
+            mainViewModel.lastUrl.observe(this, Observer {
+                mainWebView.loadUrl(it)
+            })
+
+            mainViewModel.news.observe(this, Observer {
+                mainAdapter.setNews(it)
+            })
+
+            mainViewModel.currentPage.observe(this, Observer {
+                mainPresenter.setCurrentPage(it)
+            })
+
+        }
+
     }
+
 
     private fun initAdapter() {
         mainAdapter = MainAdapter(this)
@@ -53,8 +83,10 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
     }
 
 
-    override fun showNews(news: ArrayList<Article>) {
+    override fun showNews(currentPage: Int, news: ArrayList<Article>) {
         mainAdapter.addAll(news)
+        mainViewModel.currentPage.value = currentPage
+        mainViewModel.news.value = mainAdapter.getNews()
     }
 
     override fun showLoadingError(error: String) {
@@ -76,14 +108,21 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
     }
 
     override fun onItemClicked(url: String) {
+
         mainWebView.visibility = View.VISIBLE
         mainWebView.loadUrl(url)
+
+        mainViewModel.webViewVisibility.value = mainWebView.visibility
+        mainViewModel.lastUrl.value = url
     }
 
     override fun onBackPressed() {
         if (mainWebView.isShown) {
             mainWebView.visibility = View.GONE
+            mainViewModel.webViewVisibility.value = mainWebView.visibility
         } else {
+            mainViewModel.currentPage.value = null
+            mainViewModel.news.value = null
             super.onBackPressed()
         }
     }

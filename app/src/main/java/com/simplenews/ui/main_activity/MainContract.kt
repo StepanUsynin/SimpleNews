@@ -7,7 +7,7 @@ class MainContract {
 
     interface View {
 
-        fun showNews(news: ArrayList<Article>)
+        fun showNews(currentPage: Int, news: ArrayList<Article>)
 
         fun showProgress()
 

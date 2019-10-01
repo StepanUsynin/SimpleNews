@@ -71,7 +71,11 @@ class MainPresenter : MainContract.Presenter {
         Log.d("MainActivity", "Download $currentPage page")
 
         hideProgress()
-        view.showNews(responseModel.articles)
+        view.showNews(currentPage, responseModel.articles)
+    }
+
+    fun setCurrentPage(page: Int) {
+        currentPage = page
     }
 
     private fun errorProcessing(error: String) {

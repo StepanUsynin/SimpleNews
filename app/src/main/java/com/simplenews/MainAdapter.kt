@@ -73,6 +73,11 @@ class MainAdapter(private val callback: MainAdapterCallback) :
         return news.size
     }
 
+    fun setNews(news: ArrayList<Article>) {
+        this.news = news
+        notifyDataSetChanged()
+    }
+
 
     fun addAll(newsList: ArrayList<Article>) {
         for (news in newsList) {
@@ -104,6 +109,10 @@ class MainAdapter(private val callback: MainAdapterCallback) :
     fun hideProgress() {
         isLoaderVisible = false
         removeNullItem()
+    }
+
+    fun getNews() : ArrayList<Article> {
+        return news
     }
 
     private fun removeNullItem() {
