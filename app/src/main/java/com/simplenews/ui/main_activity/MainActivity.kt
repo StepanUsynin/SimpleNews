@@ -1,8 +1,6 @@
 package com.simplenews.ui.main_activity
 
 import android.os.Bundle
-import android.view.View
-import android.webkit.WebView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -21,28 +19,18 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
     private val mainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
     private val mainPresenter = MainPresenter()
-    private lateinit var mainAdapter: MainAdapter
+    private val mainAdapter: MainAdapter = MainAdapter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mainPresenter.init(this)
         initAdapter()
-
+        mainPresenter.init(this)
 
         if (savedInstanceState == null) {
             mainPresenter.getNews()
         } else {
-
-            mainViewModel.webViewVisibility.observe(this, Observer {
-                mainWebView.visibility = it
-            })
-
-            mainViewModel.lastUrl.observe(this, Observer {
-                mainWebView.loadUrl(it)
-            })
-
             mainViewModel.news.observe(this, Observer {
                 mainAdapter.setNews(it)
             })
@@ -57,7 +45,7 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
 
 
     private fun initAdapter() {
-        mainAdapter = MainAdapter(this)
+
         val linearManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         newsRecyclerView.layoutManager = linearManager
         newsRecyclerView.adapter = mainAdapter
@@ -108,21 +96,24 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
     }
 
     override fun onItemClicked(url: String) {
-
-        mainWebView.visibility = View.VISIBLE
-        mainWebView.loadUrl(url)
-
-        mainViewModel.webViewVisibility.value = mainWebView.visibility
-        mainViewModel.lastUrl.value = url
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragmentHolder, WebViewFragment.newInstance(url))
+            .commit()
     }
 
     override fun onBackPressed() {
-        if (mainWebView.isShown) {
-            mainWebView.visibility = View.GONE
-            mainViewModel.webViewVisibility.value = mainWebView.visibility
+
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentHolder)
+
+        if (fragment != null) {
+
+            supportFragmentManager
+                .beginTransaction()
+                .remove(fragment)
+                .commit()
+
         } else {
-            mainViewModel.currentPage.value = null
-            mainViewModel.news.value = null
             super.onBackPressed()
         }
     }

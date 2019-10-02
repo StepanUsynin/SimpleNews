@@ -9,10 +9,6 @@ class MainViewModel : ViewModel() {
 
     var currentPage: MutableLiveData<Int> = MutableLiveData()
 
-    var webViewVisibility: MutableLiveData<Int> = MutableLiveData()
-
-    var lastUrl: MutableLiveData<String> = MutableLiveData()
-
     var news: MutableLiveData<ArrayList<Article>> = MutableLiveData()
 
 }
