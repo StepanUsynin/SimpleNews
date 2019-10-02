@@ -40,6 +40,7 @@ class MainPresenter : MainContract.Presenter {
     }
 
     override fun getNews() {
+        Log.d("MainActivity", "Download $currentPage page")
         showProgress()
         subscription = api
             .getNews(page = currentPage.toString())
@@ -53,7 +54,6 @@ class MainPresenter : MainContract.Presenter {
     }
 
     private fun responseProcessing(responseModel: ResponseModel) {
-        if (isError) isError = false
         for (article: Article in responseModel.articles) {
             val entity = newsDao.getArticle(
                 article.author.toString(),
@@ -68,9 +68,10 @@ class MainPresenter : MainContract.Presenter {
         isLastPage = currentPage == Constants.TOTAL_PAGES
 
         currentPage += 1
-        Log.d("MainActivity", "Download $currentPage page")
 
+        if (isError) hideError()
         hideProgress()
+
         view.showNews(currentPage, responseModel.articles)
     }
 
@@ -79,17 +80,22 @@ class MainPresenter : MainContract.Presenter {
     }
 
     private fun errorProcessing(error: String) {
+        hideProgress()
         isError = true
-        view.hideProgress()
-        view.showLoadingError(error)
+        view.showError(error)
     }
 
-    private fun showProgress(){
+    fun hideError() {
+        isError = false
+        view.hideError()
+    }
+
+    private fun showProgress() {
         isProgress = true
         view.showProgress()
     }
 
-    private fun hideProgress(){
+    private fun hideProgress() {
         isProgress = false
         view.hideProgress()
     }

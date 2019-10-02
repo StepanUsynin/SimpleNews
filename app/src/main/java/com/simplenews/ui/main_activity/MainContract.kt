@@ -13,7 +13,9 @@ class MainContract {
 
         fun hideProgress()
 
-        fun showLoadingError(error: String)
+        fun showError(error: String)
+
+        fun hideError()
 
     }
 

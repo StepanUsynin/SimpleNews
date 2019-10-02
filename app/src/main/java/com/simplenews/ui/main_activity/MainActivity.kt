@@ -43,12 +43,13 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
 
     }
 
-
     private fun initAdapter() {
 
         val linearManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         newsRecyclerView.layoutManager = linearManager
         newsRecyclerView.adapter = mainAdapter
+
+        //newsRecyclerView.post { mainAdapter.notifyItemInserted(mainAdapter.getNews().size - 1) }
 
         newsRecyclerView.addOnScrollListener(object :
             MainScrollListener(linearManager) {
@@ -77,11 +78,6 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
         mainViewModel.news.value = mainAdapter.getNews()
     }
 
-    override fun showLoadingError(error: String) {
-        mainAdapter.showError()
-        Toast.makeText(this, "Error receiving information from server", Toast.LENGTH_SHORT).show()
-    }
-
     override fun showProgress() {
         mainAdapter.showProgress()
     }
@@ -90,8 +86,17 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
         mainAdapter.hideProgress()
     }
 
-    override fun onTryAgainClicked() {
+    override fun showError(error: String) {
+        mainAdapter.showError()
+        Toast.makeText(this, "Error receiving information from server", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun hideError() {
         mainAdapter.hideError()
+    }
+
+    override fun onTryAgainClicked() {
+        mainPresenter.hideError()
         mainPresenter.getNews()
     }
 

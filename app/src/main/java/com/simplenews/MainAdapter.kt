@@ -15,15 +15,17 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 
-class MainAdapter(private val callback: MainAdapterCallback) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MainAdapter(private val callback: MainAdapterCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    companion object {
+        private const val VIEW_TYPE_LOADING = 0
+        private const val VIEW_TYPE_ITEM = 1
+        private const val VIEW_TYPE_ERROR = 2
+    }
 
     @Inject
     lateinit var picasso: Picasso
 
-    private val VIEW_TYPE_LOADING = 0
-    private val VIEW_TYPE_ITEM = 1
-    private val VIEW_TYPE_ERROR = 2
     private var isLoaderVisible = false
     private var isError = false
 
@@ -130,7 +132,11 @@ class MainAdapter(private val callback: MainAdapterCallback) :
     inner class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(article: Article) {
+
             itemView.titleTextView.text = article.title
+            itemView.descriptionTextView.text = article.description
+            itemView.dateTextView.text = article.publishedAt
+
             if (article.urlToImage != null && article.urlToImage.isNotEmpty()) {
                 picasso.load(article.urlToImage).into(itemView.imageView)
             }

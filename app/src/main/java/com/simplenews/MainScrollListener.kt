@@ -14,7 +14,7 @@ abstract class MainScrollListener(private val layoutManager: LinearLayoutManager
         val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
         if (!isLastPage() && !isLoading() && !isError()) {
-            if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 5 && firstVisibleItemPosition >= 0) {
+            if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
                 loadMoreItems()
             }
         }
