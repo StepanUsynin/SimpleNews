@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
         mainPresenter.init(this)
 
         if (savedInstanceState == null) {
-            mainPresenter.getNews()
+            mainPresenter.getNewsFromDatabase()
         } else {
 
             mainViewModel.news.observe(this, Observer {
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
         newsRecyclerView.layoutManager = linearManager
         newsRecyclerView.adapter = mainAdapter
 
-        //newsRecyclerView.post { mainAdapter.notifyItemInserted(mainAdapter.getNews().size - 1) }
+        //newsRecyclerView.post { mainAdapter.notifyItemInserted(mainAdapter.getNewsFromServer().size - 1) }
 
         newsRecyclerView.addOnScrollListener(object :
             MainScrollListener(linearManager) {
@@ -67,15 +67,18 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
             }
 
             override fun loadMoreItems() {
-                mainPresenter.getNews()
+                mainPresenter.getNewsFromServer()
             }
         })
     }
 
-
-    override fun showNews(currentPage: Int, news: ArrayList<Article>) {
-        mainAdapter.addAll(news)
+    override fun saveCurrentPage(currentPage: Int) {
         mainViewModel.currentPage.value = currentPage
+    }
+
+
+    override fun showNews(news: ArrayList<Article>) {
+        mainAdapter.addAll(news)
         mainViewModel.news.value = mainAdapter.getNews()
     }
 
@@ -98,7 +101,7 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
 
     override fun onTryAgainClicked() {
         mainPresenter.hideError()
-        mainPresenter.getNews()
+        mainPresenter.getNewsFromServer()
     }
 
     override fun onItemClicked(url: String) {

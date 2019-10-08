@@ -7,7 +7,9 @@ class MainContract {
 
     interface View {
 
-        fun showNews(currentPage: Int, news: ArrayList<Article>)
+        fun showNews(news: ArrayList<Article>)
+
+        fun saveCurrentPage(currentPage: Int)
 
         fun showProgress()
 
@@ -23,7 +25,9 @@ class MainContract {
 
         fun init(view: View)
 
-        fun getNews()
+        fun getNewsFromServer()
+
+        fun getNewsFromDatabase()
 
         fun dispose()
 

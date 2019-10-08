@@ -39,7 +39,24 @@ class MainPresenter : MainContract.Presenter {
         App.appComponent.inject(this)
     }
 
-    override fun getNews() {
+    override fun getNewsFromDatabase() {
+        val entries = newsDao.all()
+        val result = ArrayList<Article>()
+        for (entry in entries) {
+            if (entry.id != null && entry.id >= entries.size - 19) {
+                result.add(entry)
+            }
+        }
+
+        isLastPage = currentPage == Constants.TOTAL_PAGES
+
+        currentPage += 1
+
+        view.saveCurrentPage(currentPage)
+        view.showNews(result)
+    }
+
+    override fun getNewsFromServer() {
         Log.d("MainActivity", "Download $currentPage page")
         showProgress()
         subscription = api
@@ -72,7 +89,8 @@ class MainPresenter : MainContract.Presenter {
         if (isError) hideError()
         hideProgress()
 
-        view.showNews(currentPage, responseModel.articles)
+        view.saveCurrentPage(currentPage)
+        view.showNews(responseModel.articles)
     }
 
     fun setCurrentPage(page: Int) {
