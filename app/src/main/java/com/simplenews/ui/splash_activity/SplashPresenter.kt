@@ -42,12 +42,14 @@ class SplashPresenter : SplashContract.Presenter {
 
     private fun responseProcessing(responseModel: ResponseModel) {
 
-        for (article: Article in responseModel.articles) {
+        view.showLoading()
 
+        for (article: Article in responseModel.articles) {
             newsDao.insert(article)
         }
 
         view.hideLoading()
+        view.openMainActivity()
     }
 
     private fun errorProcessing(error: String) {

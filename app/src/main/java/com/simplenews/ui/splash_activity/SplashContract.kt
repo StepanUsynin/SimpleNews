@@ -5,6 +5,8 @@ class SplashContract {
 
     interface View {
 
+        fun openMainActivity()
+
         fun showLoading()
 
         fun hideLoading()

@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainAdapterCallback
         if (savedInstanceState == null) {
             mainPresenter.getNews()
         } else {
+
             mainViewModel.news.observe(this, Observer {
                 mainAdapter.setNews(it)
             })
